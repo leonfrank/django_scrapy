@@ -1,0 +1,42 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>企业详细信息</title>
+
+    <!-- meta -->
+    <link rel="stylesheet" type="text/css" href={% static 'weixin/css/bootstrap.min.css' %} />
+
+    <meta charset="UTF-8">
+</head>
+<body>
+<div class="center-block">
+<header>
+    <h1>{{ comp }}公司微信新闻列表
+    </h1>
+</header>
+    <table class="table-bordered col-md-8">
+    <thead>
+        <tr>
+            <th class="text-center">发布时间</th>
+            <th class="text-center">新闻标题</th>
+            <th class="text-center">标题得分</th>
+
+        </tr>
+    </thead>
+        <tbody>
+            {% for row in details %}
+            <tr>
+
+                    <td>{{ row.created_time }}</td>
+                    <td><a href={{ row.wx_link }}> {{ row.title }}</a></td>
+                    <td>{{ row.title_score }}</td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+</body>
+</html>
