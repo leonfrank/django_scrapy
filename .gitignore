@@ -1,3 +1,4 @@
 .blogenv
 .env
 .idea
+*.sqlite3

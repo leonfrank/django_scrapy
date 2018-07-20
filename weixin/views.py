@@ -26,14 +26,16 @@ def stats(request):
     '''
     #CompResult.objects.all().delete()
     timerange = request.GET.get("timerange")
+    #print(timerange)
+    starttime,endtime = datetime.today()-timedelta(days=1), datetime.today()
     if timerange == "oneday":
-        starttime,endtime = datetime.date(datetime.today())-timedelta(days=1), datetime.date(datetime.today())
+        starttime,endtime = datetime.today()-timedelta(days=1), datetime.today()
     elif timerange == "onemonth":
-        starttime,endtime = datetime.date(datetime.today())-timedelta(days=30), datetime.date(datetime.today())
+        starttime,endtime = datetime.today()-timedelta(days=30), datetime.today()
     comp_list = CompResult.objects.all().filter(created_time__range=[starttime,endtime]).values('company').annotate(title_score = Sum('title_score')).order_by()
 
     #print(type(comp_list))
-    return render(request,'weixin/scrapy.html',{'comp_list':comp_list})
+    return render(request,'weixin/stats.html',{'comp_list':comp_list})
 def details(request,comp):
     starttime, endtime = datetime.now() - timedelta(days=1), datetime.now()
     details = CompResult.objects.filter(Q(company = comp),created_time__range = [starttime,endtime] )
@@ -44,13 +46,15 @@ def update():
     comps = ['阿里巴巴', '百度', '京东', '万科集团', '世贸集团']
     keywords = ['违约', '法院', '诉讼', '风险']
     searchOptions = default_searchOptions()
-
+    opener = get_proxy()
+    total_count = 0
     for comp in comps:
         # print(comp)
-        newsData = get_list(comp, keywords, searchOptions)
+        newsData = get_list(comp, keywords, searchOptions,opener)
+        total_count += len(newsData)
         for record in newsData:
             compresult = CompResult(title=record['title'], company=comp, created_time=record['scrapy_time'],
                                     title_score=record['title_score'], wx_link=record['wx_link'])
             compresult.save()
 
-    print(datetime.datetime.now(), "news_count:", len(newsData))
+    print(datetime.datetime.now(), "news_count:", total_count)
